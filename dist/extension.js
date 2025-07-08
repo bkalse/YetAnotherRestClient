@@ -1,57 +1,91 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
+var __createBinding =
+  (this && this.__createBinding) ||
+  (Object.create
+    ? function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        var desc = Object.getOwnPropertyDescriptor(m, k);
+        if (
+          !desc ||
+          ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)
+        ) {
+          desc = {
+            enumerable: true,
+            get: function () {
+              return m[k];
+            },
+          };
+        }
+        Object.defineProperty(o, k2, desc);
+      }
+    : function (o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        o[k2] = m[k];
+      });
+var __setModuleDefault =
+  (this && this.__setModuleDefault) ||
+  (Object.create
+    ? function (o, v) {
+        Object.defineProperty(o, "default", { enumerable: true, value: v });
+      }
+    : function (o, v) {
+        o["default"] = v;
+      });
+var __importStar =
+  (this && this.__importStar) ||
+  (function () {
+    var ownKeys = function (o) {
+      ownKeys =
+        Object.getOwnPropertyNames ||
+        function (o) {
+          var ar = [];
+          for (var k in o)
+            if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+          return ar;
         };
-        return ownKeys(o);
+      return ownKeys(o);
     };
     return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
+      if (mod && mod.__esModule) return mod;
+      var result = {};
+      if (mod != null)
+        for (var k = ownKeys(mod), i = 0; i < k.length; i++)
+          if (k[i] !== "default") __createBinding(result, mod, k[i]);
+      __setModuleDefault(result, mod);
+      return result;
     };
-})();
+  })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
-const HISTORY_FILE = '.vscode/rest-client-history.json';
+const HISTORY_FILE = ".vscode/rest-client-history.json";
 function activate(context) {
-    context.subscriptions.push(vscode.commands.registerCommand('restClient.open', () => {
-        const panel = vscode.window.createWebviewPanel('restClient', 'REST API Client', vscode.ViewColumn.One, { enableScripts: true });
-        panel.webview.html = getWebviewContent();
-        panel.webview.onDidReceiveMessage(message => {
-            if (message.command === 'saveRequest') {
-                saveRequestToFile(message.data);
-            }
-        }, undefined, context.subscriptions);
-    }));
+  context.subscriptions.push(
+    vscode.commands.registerCommand("restClient.open", () => {
+      const panel = vscode.window.createWebviewPanel(
+        "restClient",
+        "REST API Client",
+        vscode.ViewColumn.One,
+        { enableScripts: true }
+      );
+      panel.webview.html = getWebviewContent();
+      panel.webview.onDidReceiveMessage(
+        (message) => {
+          if (message.command === "saveRequest") {
+            saveRequestToFile(message.data);
+          }
+        },
+        undefined,
+        context.subscriptions
+      );
+    })
+  );
 }
 function getWebviewContent() {
-    return `
+  return `
   <!DOCTYPE html>
   <html lang="en">
   <head>
@@ -92,7 +126,14 @@ function getWebviewContent() {
             body: method === 'GET' || method === 'DELETE' ? null : body
           });
           const text = await res.text();
-          document.getElementById('response').textContent = 'Status: ' + res.status + '\\n\\n' + text;
+          let formatted = '';
+          try {
+            const json = JSON.parse(text);
+            formatted = JSON.stringify(json, null, 2);
+          } catch {
+            formatted = text; // fallback if not valid JSON
+          }
+          document.getElementById('response').textContent = 'Status: ' + res.status + '\\n\\n' + formatted;
         } catch (err) {
           document.getElementById('response').textContent = 'Error: ' + err;
         }
@@ -103,15 +144,17 @@ function getWebviewContent() {
   `;
 }
 function saveRequestToFile(data) {
-    const workspaceFolders = vscode.workspace.workspaceFolders;
-    if (!workspaceFolders)
-        return;
-    const historyFilePath = path.join(workspaceFolders[0].uri.fsPath, HISTORY_FILE);
-    let history = [];
-    if (fs.existsSync(historyFilePath)) {
-        history = JSON.parse(fs.readFileSync(historyFilePath, 'utf8'));
-    }
-    history.push(data);
-    fs.writeFileSync(historyFilePath, JSON.stringify(history, null, 2));
+  const workspaceFolders = vscode.workspace.workspaceFolders;
+  if (!workspaceFolders) return;
+  const historyFilePath = path.join(
+    workspaceFolders[0].uri.fsPath,
+    HISTORY_FILE
+  );
+  let history = [];
+  if (fs.existsSync(historyFilePath)) {
+    history = JSON.parse(fs.readFileSync(historyFilePath, "utf8"));
+  }
+  history.push(data);
+  fs.writeFileSync(historyFilePath, JSON.stringify(history, null, 2));
 }
-function deactivate() { }
+function deactivate() {}
