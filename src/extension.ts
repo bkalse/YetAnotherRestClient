@@ -200,19 +200,84 @@ class RestClientPanel {
 <title>REST API Client</title>
 <!-- Tailwind CSS removed to comply with CSP; use inline styles instead -->
 <style>
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; margin: 0; padding: 1rem; background-color: #f3f4f6; }
-  .tab { cursor: pointer; padding: 0.5rem 1rem; border-bottom: 2px solid transparent; }
-  .tab-active { border-color: #3b82f6; font-weight: 600; }
-  .hidden { display: none; }
-  textarea, input[type="text"], input[type="password"] { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; }
-  button { background-color: #3b82f6; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; cursor: pointer; }
-  button:disabled { background-color: #93c5fd; cursor: not-allowed; }
-  .header-row { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
-  .header-row input { flex: 1; }
-  .response-container { background-color: #1e293b; color: #d1d5db; padding: 1rem; border-radius: 0.375rem; height: 300px; overflow: auto; white-space: pre-wrap; font-family: monospace; }
-  .response-tabs { display: flex; gap: 1rem; margin-top: 1rem; }
-  .response-tab { cursor: pointer; padding: 0.25rem 0.5rem; border-bottom: 2px solid transparent; }
-  .response-tab-active { border-color: #3b82f6; font-weight: 600; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 1rem;
+    background-color: #f3f4f6;
+    color: #333;
+  }
+  .tab {
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.3s;
+  }
+  .tab-active {
+    border-color: #3b82f6;
+    font-weight: bold;
+  }
+  .hidden {
+    display: none;
+  }
+  textarea,
+  input[type="text"],
+  input[type="password"] {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+  }
+  button {
+    background-color: #3b82f6;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s;
+  }
+  button:hover {
+    background-color: #2563eb;
+  }
+  button:disabled {
+    background-color: #93c5fd;
+    cursor: not-allowed;
+  }
+  .header-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .header-row input {
+    flex: 1;
+  }
+  .response-container {
+    background-color: #1e293b;
+    color: #d1d5db;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    height: 300px;
+    overflow: auto;
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+  .response-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .response-tab {
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.3s;
+  }
+  .response-tab-active {
+    border-color: #3b82f6;
+    font-weight: bold;
+  }
 </style>
 </head>
 <body>
