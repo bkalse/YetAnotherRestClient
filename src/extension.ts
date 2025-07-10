@@ -189,10 +189,10 @@ class RestClientPanel {
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}' https://cdn.tailwindcss.com;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>REST API Client</title>
-<script nonce="${nonce}" src="https://cdn.tailwindcss.com"></script>
+<!-- Tailwind CSS removed to comply with CSP; use inline styles instead -->
 <style>
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; margin: 0; padding: 1rem; background-color: #f3f4f6; }
   .tab { cursor: pointer; padding: 0.5rem 1rem; border-bottom: 2px solid transparent; }
@@ -213,13 +213,13 @@ class RestClientPanel {
   <h1 class="text-2xl font-bold mb-4">REST API Client</h1>
   <div>
     <div class="flex gap-4 border-b mb-4">
-      <div id="tab-request" class="tab tab-active">Request</div>
-      <div id="tab-headers" class="tab">Headers</div>
-      <div id="tab-auth" class="tab">Auth</div>
-      <div id="tab-payload" class="tab">Payload</div>
+      <div class="tab tab-active" id="tab-request">Request</div>
+      <div class="tab" id="tab-headers">Headers</div>
+      <div class="tab" id="tab-auth">Auth</div>
+      <div class="tab" id="tab-payload">Payload</div>    
     </div>
 
-    <div id="content-request">
+    <div id="content-request" class="tab-content">
       <div class="mb-2">
         <select id="method" class="border rounded p-2 w-32">
           <option>GET</option>
@@ -232,12 +232,12 @@ class RestClientPanel {
       </div>
     </div>
 
-    <div id="content-headers" class="hidden">
+    <div id="content-headers" class="tab-content hidden">
       <div id="headers-list"></div>
       <button id="add-header">Add Header</button>
     </div>
 
-    <div id="content-auth" class="hidden">
+    <div id="content-auth" class="tab-content hidden">
       <select id="auth-type" class="border rounded p-2 w-48 mb-2">
         <option value="none">None</option>
         <option value="basic">Basic Auth</option>
@@ -252,7 +252,7 @@ class RestClientPanel {
       </div>
     </div>
 
-    <div id="content-payload" class="hidden">
+    <div id="content-payload" class="tab-content hidden">
       <textarea id="payload" rows="10" placeholder="Request body (JSON)"></textarea>
     </div>
 
@@ -333,8 +333,8 @@ class RestClientPanel {
       const headers = [];
       headersList.querySelectorAll('.header-row').forEach(row => {
         const inputs = row.querySelectorAll('input');
-        const key = (inputs[0] as HTMLInputElement).value.trim();
-        const value = (inputs[1] as HTMLInputElement).value.trim();
+        const key = inputs[0].value.trim();
+        const value = inputs[1].value.trim();
         if (key) {
           headers.push({ key, value });
         }
