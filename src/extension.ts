@@ -21,9 +21,13 @@ interface CollectionData {
   requests: RequestData[];
 }
 
+// Logging for debugging
 export function activate(context: vscode.ExtensionContext) {
-  // Use globalState to store collections folder path
+  console.log('Activating extension...');
   let collectionsPath = context.globalState.get<string>('restClient.collectionsPath');
+  console.log('Initial collectionsPath:', collectionsPath);
+  // Use globalState to store collections folder path
+  collectionsPath = context.globalState.get<string>('restClient.collectionsPath');
 
   async function selectCollectionsFolder() {
     const folders = await vscode.window.showOpenDialog({
@@ -51,9 +55,11 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   // Register TreeView provider for collections
-  const collectionsProvider = new CollectionsProvider(collectionsPath || '');
+    console.log('Initializing CollectionsProvider with path:', collectionsPath || '');
+    const collectionsProvider = new CollectionsProvider(collectionsPath || '');
 
-  vscode.window.registerTreeDataProvider('restClientCollections', collectionsProvider);
+    vscode.window.registerTreeDataProvider('restClientCollections', collectionsProvider);
+    console.log('Registered TreeDataProvider for restClientCollections');
 
   // Register command to open REST client webview
   context.subscriptions.push(
@@ -359,7 +365,7 @@ class RestClientPanel {
         id: generateId(),
         name: url,
         method,
-        url,
+        url: "https://api.restful-api.dev/objects",
         headers,
         auth,
         payload,
