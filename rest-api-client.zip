@@ -1,0 +1,56 @@
+rest-api-client/
+├── package.json
+├── next.config.mjs
+├── README.md
+├── tailwind.config.ts
+├── tsconfig.json
+├── postcss.config.mjs
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── globals.css
+│   └── app.tsx
+├── components/
+│   ├── theme-provider.tsx
+│   ├── ui/
+│   │   ├── button.tsx
+│   │   ├── input.tsx
+│   │   ├── label.tsx
+│   │   ├── textarea.tsx
+│   │   ├── tabs.tsx
+│   │   ├── select.tsx
+│   │   ├── checkbox.tsx
+│   │   ├── card.tsx
+│   │   ├── badge.tsx
+│   │   ├── scroll-area.tsx
+│   │   ├── separator.tsx
+│   │   ├── resizable.tsx
+│   │   └── dropdown-menu.tsx
+│   ├── layout/
+│   │   └── sidebar.tsx
+│   ├── request/
+│   │   └── request-builder.tsx
+│   └── response/
+│       └── response-viewer.tsx
+├── contexts/
+│   └── api-context.tsx
+├── lib/
+│   ├── utils.ts
+│   ├── types/
+│   │   └── api.ts
+│   ├── constants/
+│   │   └── methods.ts
+│   └── utils/
+│       ├── storage.ts
+│       └── api-client.ts
+├── hooks/
+│   ├── use-mobile.ts
+│   └── use-toast.ts
+├── electron/
+│   ├── main.js
+│   ├── preload.js
+│   └── assets/
+│       └── README.txt
+└── scripts/
+    ├── build.sh
+    └── build.ps1
