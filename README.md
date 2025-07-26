@@ -18,7 +18,7 @@ A modern, cross-platform REST API client built with Next.js and Electron.
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 
 ### Setup
@@ -37,19 +37,25 @@ A modern, cross-platform REST API client built with Next.js and Electron.
 ### Building
 
 #### Build for all platforms:
+
 \`\`\`bash
 npm run dist
 \`\`\`
 
 #### Build for specific platforms:
+
 \`\`\`bash
+
 # Windows
+
 npm run dist-win
 
-# macOS  
+# macOS
+
 npm run dist-mac
 
 # Linux
+
 npm run dist-linux
 \`\`\`
 
@@ -74,12 +80,12 @@ npm run dist-linux
 ## File Structure
 
 \`\`\`
-├── electron/           # Electron main process files
-├── components/         # React components
-├── contexts/          # React contexts
-├── lib/               # Utilities and types
-├── public/            # Static assets
-└── scripts/           # Build scripts
+├── electron/ # Electron main process files
+├── components/ # React components
+├── contexts/ # React contexts
+├── lib/ # Utilities and types
+├── public/ # Static assets
+└── scripts/ # Build scripts
 \`\`\`
 
 ## Distribution
@@ -87,12 +93,9 @@ npm run dist-linux
 The built applications will be available in the `dist/` folder:
 
 - **Windows**: `.exe` installer
-- **macOS**: `.dmg` disk image  
+- **macOS**: `.dmg` disk image
 - **Linux**: `.AppImage` and `.deb` packages
 
 ## License
 
 MIT License
-\`\`\`
-
-I'll continue with the remaining essential files to ensure this is a completely fresh project...
