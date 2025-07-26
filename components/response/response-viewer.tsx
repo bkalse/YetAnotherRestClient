@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useApi } from "@/contexts/api-context"
-import { Clock, Database, CheckCircle, XCircle } from "lucide-react"
+import { Clock, Database, CheckCircle, XCircle, AlertTriangle } from "lucide-react"
 
 export function ResponseViewer() {
   const { state } = useApi()
@@ -76,6 +76,22 @@ export function ResponseViewer() {
           </div>
         </div>
       </div>
+
+      {state.response?.data?._truncated && (
+        <div className="mx-4 mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+            <div className="text-sm">
+              <p className="font-medium text-yellow-800 dark:text-yellow-200">Large Response Detected</p>
+              <p className="text-yellow-700 dark:text-yellow-300 mt-1">
+                This response ({Math.floor((state.response.data._originalSize || 0) / 1024)}KB) was too large for
+                history storage and has been truncated. The full response is shown here but only a preview is saved in
+                history.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Response Content */}
       <div className="flex-1 p-4">

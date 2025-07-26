@@ -39,3 +39,6 @@ Backup/user-property-crud (5).zip
 Backup/user-property-crud (6).zip
 Backup/user-property-crud (7).zip
 Backup/user-property-crud.zip
+
+# .bak files - Manual backups
+*.bak

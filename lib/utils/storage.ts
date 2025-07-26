@@ -13,12 +13,14 @@ interface AppSettings {
   maxHistoryItems: number
   maxHistoryAge: number // in days
   autoCleanup: boolean
+  maxResponseSize: number // in bytes
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
   maxHistoryItems: 50, // Reduced from 100
   maxHistoryAge: 30, // Keep history for 30 days
   autoCleanup: true,
+  maxResponseSize: 1024 * 1024, // 1MB max response size for history
 }
 
 export class StorageManager {
@@ -81,24 +83,88 @@ export class StorageManager {
         processedHistory = this.cleanupHistory(processedHistory, settings)
       }
 
+      // Limit response sizes in history
+      processedHistory = processedHistory.map((item) => ({
+        ...item,
+        response: this.limitResponseSize(item.response, settings.maxResponseSize),
+      }))
+
       // Limit the number of items
       if (processedHistory.length > settings.maxHistoryItems) {
         processedHistory = processedHistory.slice(0, settings.maxHistoryItems)
       }
 
-      localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(processedHistory))
+      // Try to save, with progressive fallbacks
+      this.saveHistoryWithFallback(processedHistory)
     } catch (error) {
       console.error("Error saving history:", error)
-      if (error.name === "QuotaExceededError") {
-        this.handleQuotaExceeded("history")
-        // Try again with reduced history
-        const reducedHistory = history.slice(0, Math.floor(history.length / 2))
-        try {
-          localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(reducedHistory))
-        } catch (retryError) {
-          console.error("Failed to save even reduced history:", retryError)
-          // Clear history as last resort
-          localStorage.removeItem(STORAGE_KEYS.HISTORY)
+      this.handleQuotaExceeded("history")
+    }
+  }
+
+  private static limitResponseSize(response: any, maxSize: number): any {
+    const responseStr = JSON.stringify(response)
+    if (responseStr.length <= maxSize) {
+      return response
+    }
+
+    // If response is too large, truncate the data but keep metadata
+    const truncatedResponse = {
+      ...response,
+      data: {
+        _truncated: true,
+        _originalSize: responseStr.length,
+        _message: "Response too large for history storage",
+        _preview:
+          typeof response.data === "string"
+            ? response.data.substring(0, 1000) + "..."
+            : JSON.stringify(response.data).substring(0, 1000) + "...",
+      },
+    }
+
+    return truncatedResponse
+  }
+
+  private static saveHistoryWithFallback(history: RequestHistory[]): void {
+    const attempts = [
+      () => localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(history)),
+      () => {
+        // Fallback 1: Reduce to half the items
+        const reduced = history.slice(0, Math.floor(history.length / 2))
+        localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(reduced))
+      },
+      () => {
+        // Fallback 2: Keep only last 10 items with minimal data
+        const minimal = history.slice(0, 10).map((item) => ({
+          ...item,
+          response: {
+            status: item.response.status,
+            statusText: item.response.statusText,
+            headers: {},
+            data: { _truncated: true, _message: "Data removed to save space" },
+            responseTime: item.response.responseTime,
+            size: item.response.size,
+          },
+        }))
+        localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(minimal))
+      },
+      () => {
+        // Fallback 3: Clear history entirely
+        localStorage.removeItem(STORAGE_KEYS.HISTORY)
+      },
+    ]
+
+    for (let i = 0; i < attempts.length; i++) {
+      try {
+        attempts[i]()
+        if (i > 0) {
+          console.warn(`History saved with fallback method ${i}`)
+        }
+        return
+      } catch (error) {
+        if (i === attempts.length - 1) {
+          console.error("All fallback methods failed:", error)
+          throw error
         }
       }
     }

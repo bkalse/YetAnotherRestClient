@@ -37,6 +37,7 @@ export function SettingsDialog({ open, onOpenChange, onSettingsChange }: Setting
     maxHistoryItems: 50,
     maxHistoryAge: 30,
     autoCleanup: true,
+    maxResponseSize: 1024 * 1024, // 1MB
   })
   const [storageUsage, setStorageUsage] = useState({ used: 0, total: 0, percentage: 0 })
   const [showClearDialog, setShowClearDialog] = useState<"history" | "all" | null>(null)
@@ -153,6 +154,26 @@ export function SettingsDialog({ open, onOpenChange, onSettingsChange }: Setting
                     onChange={(e) => setSettings({ ...settings, maxHistoryAge: Number.parseInt(e.target.value) || 30 })}
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="max-response-size">Max Response Size for History (KB)</Label>
+                <Input
+                  id="max-response-size"
+                  type="number"
+                  min="100"
+                  max="5000"
+                  value={Math.floor(settings.maxResponseSize / 1024)}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      maxResponseSize: (Number.parseInt(e.target.value) || 1024) * 1024,
+                    })
+                  }
+                />
+                <p className="text-xs text-muted-foreground">
+                  Large responses will be truncated in history to save storage space
+                </p>
               </div>
 
               <div className="flex items-center space-x-2">

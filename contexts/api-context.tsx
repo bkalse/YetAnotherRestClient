@@ -5,6 +5,7 @@ import { createContext, useContext, useReducer, useEffect } from "react"
 import type { Collection, RequestConfig, RequestHistory, Environment, ApiResponse } from "@/lib/types/api"
 import { StorageManager } from "@/lib/utils/storage"
 import { ApiClient } from "@/lib/utils/api-client"
+import { useToast } from "@/hooks/use-toast"
 import { v4 as uuidv4 } from "uuid"
 
 interface ApiState {
@@ -156,6 +157,15 @@ function apiReducer(state: ApiState, action: ApiAction): ApiState {
 
     case "ADD_TO_HISTORY":
       const settings = StorageManager.getSettings()
+
+      // Check if response is too large and show warning
+      const responseSize = JSON.stringify(action.payload.response).length
+      if (responseSize > settings.maxResponseSize) {
+        console.warn(
+          `Response size (${Math.floor(responseSize / 1024)}KB) exceeds limit (${Math.floor(settings.maxResponseSize / 1024)}KB). Response will be truncated in history.`,
+        )
+      }
+
       const historyItem = [action.payload, ...state.history]
 
       // Apply limits immediately
@@ -245,6 +255,7 @@ const ApiContext = createContext<{
 
 export function ApiProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(apiReducer, initialState)
+  const { toast } = useToast()
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -433,6 +444,18 @@ export function ApiProvider({ children }: { children: React.ReactNode }) {
       const response = await ApiClient.sendRequest(state.currentRequest, state.activeEnvironment || undefined)
 
       dispatch({ type: "SET_RESPONSE", payload: response })
+
+      // Check response size before adding to history
+      const responseSize = JSON.stringify(response).length
+      const settings = StorageManager.getSettings()
+
+      if (responseSize > settings.maxResponseSize) {
+        toast({
+          title: "Large Response Detected",
+          description: `Response (${Math.floor(responseSize / 1024)}KB) exceeds storage limit. It will be truncated in history.`,
+          variant: "default",
+        })
+      }
 
       // Add to history
       const historyItem: RequestHistory = {
