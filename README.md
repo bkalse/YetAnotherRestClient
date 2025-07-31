@@ -1,4 +1,4 @@
-# REST API Client - Desktop App
+# REST API Client
 
 A modern, cross-platform REST API client built with Next.js and Electron.
 <img width="1348" height="634" alt="image" src="https://github.com/user-attachments/assets/85f2475b-1f99-4b78-952d-5680cb90268a" />
